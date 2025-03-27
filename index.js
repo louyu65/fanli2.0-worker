@@ -3,14 +3,66 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-const corsHeaders = {
-        'Access-Control-Allow-Origin': '*', // 允许所有来源访问，或者指定具体的域名，例如 'https://example.com'
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', // 允许的 HTTP 方法
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization', // 允许的自定义请求头
-      };
-  const appkey = TAOBAO_APP_KEY;
-  const appsecret = TAOBAO_ACCESS_TOKEN;
-  const REST_URL = 'http://gw.api.taobao.com/router/rest';
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+      // 根据路径选择对应的处理函数
+  switch (pathname) {
+    case '/querytaobaoproduct':
+      return await handleQueryTaobaoProduct(request);
+    case '/gettaobaopassword':
+      return await handleGetTaobaoPassword(request);
+    default:
+      return new Response('Invalid path', { status: 404 });
+  }
+
+}
+const appkey = TAOBAO_APP_KEY;
+const appsecret = TAOBAO_ACCESS_TOKEN;
+const REST_URL = 'http://gw.api.taobao.com/router/rest';
+//获取商品的
+async function gettaobaopassword(request) {
+    const url = new URL(request.url);
+    const taobaoUrl = url.searchParams.get('taobaoUrl');
+    if (!taobaoUrl) {
+        return new Response('Please provide a taobaoUrl as a query parameter.', { status: 400 });
+      }
+    const timestamp_str = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const params = new URLSearchParams({
+      method: 'taobao.tbk.dg.material.optional.upgrade',
+      app_key: appkey,
+      //timestamp: Math.floor(Date.now() / 1000).toString(),
+      timestamp:timestamp_str,
+      format: 'json',
+      v: '2.0',
+      sign_method: 'md5',
+      url:taobaoUrl
+      
+      
+    });
+    // Create the signature using a pure JavaScript MD5 implementation
+    //const signature = md51(appsecret + paramString + appsecret).toUpperCase();
+    const signature = signTopRequest(params ,appsecret,'md5').toUpperCase();
+    params.append('sign', signature);
+  
+    const response = await fetch(`${REST_URL}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  
+    return new Response(await response.text(), {
+      headers: { 'content-type': 'application/json' ,'Access-Control-Allow-Origin':'*'},
+    });
+}
+
+//查询商品清单
+async function handleQueryTaobaoProduct(request) {
+  
   const url = new URL(request.url);
   const keyword = url.searchParams.get('keyword');
   const pageSize = url.searchParams.get('page_size') || '20';
