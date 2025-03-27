@@ -28,7 +28,7 @@ async function gettaobaopassword(request) {
       }
     const timestamp_str = new Date().toISOString().replace('T', ' ').substring(0, 19);
     const params = new URLSearchParams({
-      method: 'taobao.tbk.dg.material.optional.upgrade',
+      method: 'taobao.tbk.tpwd.create',
       app_key: appkey,
       //timestamp: Math.floor(Date.now() / 1000).toString(),
       timestamp:timestamp_str,
@@ -70,15 +70,15 @@ async function handleQueryTaobaoProduct(request) {
   const itemLoc = url.searchParams.get('itemloc') || '';
   const userIp = url.searchParams.get('userIp') || '';
 
-  const startPrice = url.searchParams.get('startPrice') || '0';
-  const endPrice = url.searchParams.get('endPrice') || '100000';
-  const isTmall = url.searchParams.get('isTmall') || 'false';
-  const isOverseas = url.searchParams.get('isOverseas') || 'false';
-  const sort = url.searchParams.get('sort') || 'tk_rate_des';
-  const start_tk_rate = url.searchParams.get('start_tk_rate') || '1';
-  const end_tk_rate = url.searchParams.get('end_tk_rate') || '9999';
+  const startPrice = url.searchParams.get('startPrice') || '0';//商品最低价格
+  const endPrice = url.searchParams.get('endPrice') || '100000';//商品最高价格
+  const isTmall = url.searchParams.get('isTmall') || 'false';//是否是填报商城 true -是,false-不限
+  const isOverseas = url.searchParams.get('isOverseas') || 'false';//是否海淘商品 true -是,false-不限
+  const sort = url.searchParams.get('sort') || 'tk_rate_des';//排序_des（降序），排序_asc（升序），销量（total_sales），淘客收入比率（tk_rate），营销计划佣金（tk_mkt_rate）， 累计推广量（tk_total_sales），总支出佣金（tk_total_commi），预估到价格（final_promotion_price），匹配分（match）
+  const start_tk_rate = url.searchParams.get('start_tk_rate') || '1';//（不添加界面删选）商品筛选-淘客收入比率下限(商品佣金比率+补贴比率)。如：1234表示12.34%
+  const end_tk_rate = url.searchParams.get('end_tk_rate') || '9999';//（不添加界面筛选）商品筛选-淘客收入比率上限(商品佣金比率+补贴比率)。如：1234表示12.34%
 
-  const start_dsr = url.searchParams.get('start_dsr') || '0';
+  const start_dsr = url.searchParams.get('start_dsr') || '0';//商品筛选-店铺dsr评分。筛选大于等于当前设置的店铺dsr评分的商品0-50000之间
   const has_coupon = url.searchParams.get('has_coupon') || 'false';//是否有优惠券，默认不限
   const need_free_shipment = url.searchParams.get('need_free_shipment') || 'false';//是否包邮，不限
   
