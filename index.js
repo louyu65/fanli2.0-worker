@@ -15,8 +15,27 @@ const corsHeaders = {
   const keyword = url.searchParams.get('keyword');
   const pageSize = url.searchParams.get('page_size') || '20';
   const pageNo = url.searchParams.get('page_no') || '1';
-  const itemLoc = url.searchParams.get('itemloc') || '杭州';
-  const userIp = url.searchParams.get('userIp') || '杭州';
+  const itemLoc = url.searchParams.get('itemloc') || '';
+  const userIp = url.searchParams.get('userIp') || '';
+
+  const startPrice = url.searchParams.get('startPrice') || '0';
+  const endPrice = url.searchParams.get('endPrice') || '100000';
+  const isTmall = url.searchParams.get('isTmall') || 'false';
+  const isOverseas = url.searchParams.get('isOverseas') || 'false';
+  const sort = url.searchParams.get('sort') || 'tk_rate_des';
+  const start_tk_rate = url.searchParams.get('start_tk_rate') || '1';
+  const end_tk_rate = url.searchParams.get('end_tk_rate') || '9999';
+
+  const start_dsr = url.searchParams.get('start_dsr') || '0';
+  const has_coupon = url.searchParams.get('has_coupon') || 'false';//是否有优惠券，默认不限
+  const need_free_shipment = url.searchParams.get('need_free_shipment') || 'false';//是否包邮，不限
+  
+  const include_good_rate = url.searchParams.get('include_good_rate') || 'false'; //商品筛选-好评率是否高于行业均值。True表示大于等于，false或不设置表示不限
+  const npx_level  = url.searchParams.get('npx_level')|| '1'//商品筛选-牛皮癣程度。取值：1不限，2无，3轻微
+  const promotion_type  = url.searchParams.get('promotion_type')|| '1'  //1-自购省，2-推广赚（代理模式专属ID，代理模式必填，非代理模式不用填写该字段）
+  const get_topn_rate  = url.searchParams.get('get_topn_rate')|| '0' //是否获取前N件佣金信息 0否，1是，其他值否
+  const biz_scene_id  = url.searchParams.get('biz_scene_id')|| '1' //1-动态ID转链场景，2-消费者比价场景（不填默认为1）；
+  const mgc_status  = url.searchParams.get('mgc_status')|| '0' 
   if (!keyword) {
     return new Response('Please provide a keyword as a query parameter.', { status: 400 });
   }
@@ -32,35 +51,33 @@ const corsHeaders = {
     page_size: pageSize,
     page_no: pageNo,
     adzone_id: TAOBAO_PID,
-    start_dsr:'0',
-	  end_tk_rate:'1234',
-	  start_tk_rate:'1',
-	  end_price:'100000',
-	  start_price:'0',
-	  is_overseas:'false',
-	  is_tmall:'false',
-	  sort:'tk_rate_des',
-	  itemloc:itemLoc,
+    start_dsr:start_dsr,
+	end_tk_rate:end_tk_rate,
+	start_tk_rate:start_tk_rate,
+	end_price:endPrice,
+	start_price:startPrice,
+	is_overseas:isOverseas,
+	is_tmall:isTmall,
+	sort:sort,//排序_des（降序），排序_asc（升序），销量（total_sales），淘客收入比率（tk_rate），营销计划佣金（tk_mkt_rate）， 累计推广量（tk_total_sales），总支出佣金（tk_total_commi），预估到价格（final_promotion_price），匹配分（match）
+	itemloc:itemLoc,
 	  //'cat':'16,18',
-	  'q':keyword,
-  //	'material_id':'80309',
-	 has_coupon:'false',
-	ip:userIp,
-	 need_free_shipment:'true',
+	'q':keyword,
+	 has_coupon:has_coupon,
+	 ip:userIp,
+	 need_free_shipment:need_free_shipment,
 	need_prepay:'true',
 	include_pay_rate_30:'false',
-	include_good_rate:'false',
+	include_good_rate:include_good_rate,
 	include_rfd_rate:'false',
-	 npx_level:'1',
-	get_topn_rate:'0',
-	biz_scene_id:'1',
-	promotion_type:'1',
+	npx_level:npx_level,
+	get_topn_rate:get_topn_rate,
+	biz_scene_id:biz_scene_id,
+	promotion_type:promotion_type,
 	
 	mgc_status:'0',
 	
 	
   });
-
   // Create the signature using a pure JavaScript MD5 implementation
   //const signature = md51(appsecret + paramString + appsecret).toUpperCase();
   const signature = signTopRequest(params ,appsecret,'md5').toUpperCase();
