@@ -20,7 +20,7 @@ const appkey = TAOBAO_APP_KEY;
 const appsecret = TAOBAO_ACCESS_TOKEN;
 const REST_URL = 'http://gw.api.taobao.com/router/rest';
 //获取商品的
-async function gettaobaopassword(request) {
+async function handleGetTaobaoPassword(request) {
     const url = new URL(request.url);
     const taobaoUrl = url.searchParams.get('taobaoUrl');
     if (!taobaoUrl) {
