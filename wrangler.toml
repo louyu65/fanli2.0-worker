@@ -1,0 +1,3 @@
+name = "fanli20-worker"
+main = "index.js"  # 指定入口文件
+compatibility_date = "2025-03-27"
