@@ -171,6 +171,7 @@ async function handleQueryTaobaoProduct(request) {
 	
 	
   });
+  console.log(params.toString());
   // Create the signature using a pure JavaScript MD5 implementation
   //const signature = md51(appsecret + paramString + appsecret).toUpperCase();
   const signature = signTopRequest(params ,appsecret,'md5').toUpperCase();
