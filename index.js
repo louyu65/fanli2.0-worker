@@ -11,6 +11,8 @@ async function handleRequest(request) {
       return await handleQueryTaobaoProduct(request);
     case '/gettaobaopassword':
       return await handleGetTaobaoPassword(request);
+    case '/longurltoshort':
+        return await handleLongUrlToShort(request);
     default:
       return new Response('Invalid path', { status: 404 });
   }
@@ -19,6 +21,45 @@ async function handleRequest(request) {
 const appkey = TAOBAO_APP_KEY;
 const appsecret = TAOBAO_ACCESS_TOKEN;
 const REST_URL = 'http://gw.api.taobao.com/router/rest';
+async function handleLongUrlToShort(request){
+    const url = new URL(request.url);
+    const taobaoUrl = url.searchParams.get('taobaoUrl');
+    if (!taobaoUrl) {
+        return new Response('Please provide a taobaoUrl as a query parameter.', { status: 400 });
+      }
+    const timestamp_str = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const params = new URLSearchParams({
+      method: 'taobao.tbk.spread.get',
+      app_key: appkey,
+      //timestamp: Math.floor(Date.now() / 1000).toString(),
+      timestamp:timestamp_str,
+      format: 'json',
+      v: '2.0',
+      sign_method: 'md5',
+      requests:JSON.stringify([{url: taobaoUrl}])  
+      
+      
+    });
+    // Create the signature using a pure JavaScript MD5 implementation
+    //const signature = md51(appsecret + paramString + appsecret).toUpperCase();
+    const signature = signTopRequest(params ,appsecret,'md5').toUpperCase();
+    params.append('sign', signature);
+  
+    const response = await fetch(`${REST_URL}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return new Response(await response.text(), {
+      headers: { 'content-type': 'application/json' ,'Access-Control-Allow-Origin':'*'},
+    });
+}
+
 //获取商品的
 async function handleGetTaobaoPassword(request) {
     const url = new URL(request.url);
@@ -72,7 +113,7 @@ async function handleQueryTaobaoProduct(request) {
 
   const startPrice = url.searchParams.get('startPrice') || '0';//商品最低价格
   const endPrice = url.searchParams.get('endPrice') || '100000';//商品最高价格
-  const isTmall = url.searchParams.get('isTmall') || 'false';//是否是填报商城 true -是,false-不限
+  const isTmall = url.searchParams.get('isTmall') || 'false';//是否是天猫商城 true -是,false-不限
   const isOverseas = url.searchParams.get('isOverseas') || 'false';//是否海淘商品 true -是,false-不限
   const sort = url.searchParams.get('sort') || 'tk_rate_des';//排序_des（降序），排序_asc（升序），销量（total_sales），淘客收入比率（tk_rate），营销计划佣金（tk_mkt_rate）， 累计推广量（tk_total_sales），总支出佣金（tk_total_commi），预估到价格（final_promotion_price），匹配分（match）
   const start_tk_rate = url.searchParams.get('start_tk_rate') || '1';//（不添加界面删选）商品筛选-淘客收入比率下限(商品佣金比率+补贴比率)。如：1234表示12.34%
